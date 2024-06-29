@@ -39,22 +39,30 @@ const startScrape = async (account, symbol) => {
 
 // Function to get scraping
 const getScrape = async (accounts, symbol, time) => {
-  let totalMentions = 0;
+  try {
+    let totalMentions = 0;
 
-  for (const account of accounts) {
-    const count = await startScrape(account, symbol);
-    totalMentions += count;
+    for (const account of accounts) {
+      const count = await startScrape(account, symbol);
+      totalMentions += count;
+    }
+
+    console.log(
+      `'${symbol}' was mentioned '${totalMentions}' times in the last '${time}' minutes.`
+    );
+  } catch (err) {
+    console.log(err);
   }
-
-  console.log(
-    `'${symbol}' was mentioned '${totalMentions}' times in the last '${time}' minutes.`
-  );
 };
 
 const scheduleScraping = (accounts, symbol, time) => {
-  cron.schedule(`*/${time} * * * *`, async () => {
-    await getScrape(accounts, symbol, time);
-  });
+  try {
+    cron.schedule(`*/${time} * * * *`, async () => {
+      await getScrape(accounts, symbol, time);
+    });
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 scheduleScraping(twitterAccounts, "$TSLA", 1);
